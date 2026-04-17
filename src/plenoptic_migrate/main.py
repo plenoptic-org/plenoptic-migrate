@@ -1,15 +1,65 @@
 #!/usr/bin/env python3
 
+from typing import Annotated
+from rich import print
+from rich.progress import track
+from rich.console import Console
+import warnings
 import typer
 from plenoptic import _api_change
 import itertools
-import pathlib
+from pathlib import Path
 
-app = typer.Typer()
+app = typer.Typer(add_completion=False)
+stderr = Console(stderr=True)
+console = Console()
 
 
 @app.command()
-def migrate(paths: list[str]):
+def migrate(
+        paths: Annotated[list[Path], typer.Argument(help="Directory or text files to update (e.g., .py scripts, .ipynb notebooks, .md files). Non-text files will be skipped.")],
+        backup_dir: Annotated[Path, typer.Option(help="Path where we will create a directory to copy existing paths into. Must not exist.")] = None,
+    ):
+    """Migrate from plenoptic 1.x to 2.0.
+
+    Rewrites all occurrences of old API names to their new equivalents, in-place, for
+    each file passed as a command-line argument. After rewriting, reports any deprecated
+    usages that could not be automatically resolved and must be updated manually.
+
+    This script only changes fully resolvable plenoptic objects. For example, it will
+    replace `plenoptic.synth.Metamer` with `plenoptic.Metamer`, but will not
+    touch `from plenoptic.synthesize import Metamer`.
+
+    We overwrite all files in-place. We therefore recommend that you track your files
+    using git or make use of the --backup-dir option to create a backup. You are then
+    encouraged to double-check all the changes! This script worked for the developers of
+    plenoptic but has not been tested on a wide variety of setups.
+
+    Module aliases
+    --------------
+    The script handles the standard module aliases used in plenoptic's tutorials
+    and examples:
+
+        import plenoptic as po
+        import plenoptic.synthesize as synth
+        import plenoptic.simulate as simul
+
+    Non-standard aliases (e.g. `import plenoptic as plen`) are not handled and
+    must be updated manually.
+
+    """
+    if not backup_dir or backup_dir == Path("."):
+        backup = typer.confirm("Are you sure you wish to proceed without making a backup?")
+        if not backup:
+            raise typer.Abort()
+    else:
+        if backup_dir.exists():
+            raise typer.BadParameter("backup directory must not already exist!")
+        backup_dir.mkdir()
+        print(f"Copying all specified files into [blue]{backup_dir}[blue]")
+        for p in paths:
+            p.copy_into(backup_dir)
+
     deprecated = {}
     UPDATED_API = _api_change.API_CHANGE
     UPDATED_API.update(_api_change.SYNTH_PLOT_FUNCS)
@@ -21,9 +71,21 @@ def migrate(paths: list[str]):
         for mods in itertools.combinations(_api_change.MODULE_ALIASES, i):
             module_aliases.append({k: _api_change.MODULE_ALIASES[k] for k in mods})
 
+    iter_paths = []
     for p in paths:
-        p = pathlib.Path(p)
-        file_contents = p.read_text()
+        if p.is_dir():
+            iter_paths.extend(list(p.rglob("**")))
+        else:
+            iter_paths.append(p)
+
+    for p in track(iter_paths):
+        try:
+            file_contents = p.read_text()
+        except Exception as e:
+            msg = f"Unable to read text from [blue]{p}[/blue], with following error, skipping."
+            err_msg = f"{type(e).__name__}: {e}"
+            stderr.print(f"\n[bold red]WARNING:[/bold red] {msg}\n    {err_msg}")
+            continue
         for old_func, new_func in UPDATED_API.items():
             file_contents = file_contents.replace(old_func, new_func)
             for aliases in module_aliases:

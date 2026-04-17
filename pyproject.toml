@@ -6,7 +6,8 @@ readme = "README.md"
 authors = [
     { name = "William F. Broderick", email = "billbrod@gmail.com" }
 ]
-requires-python = ">=3.11"
+# needed for pathlib.copy_into
+requires-python = ">=3.14"
 dependencies = [
     "plenoptic",
     "typer>=0.24.1",
