@@ -15,8 +15,22 @@ using git or make use of the --backup-dir option to create a backup. You are the
 encouraged to double-check all the changes! This tool worked for the developers of
 plenoptic but has not been tested on a wide variety of setups.
 
-Module aliases
---------------
+## Installation
+
+The recommended way to use the tool is via [uvx](https://docs.astral.sh/uv/#tools) or [pipx](https://pipx.pypa.io/stable/), both of which will create a temporary isolated virtual environment for the tool:
+
+```console
+$ pipx run plenoptic-migrate --help
+```
+
+or
+
+```console
+$ uvx plenoptic-migrate --help
+```
+
+## Module aliases
+
 The tool handles the standard module aliases used in plenoptic&#x27;s tutorials
 and examples:
 
@@ -27,7 +41,7 @@ and examples:
 Non-standard aliases (e.g. `import plenoptic as plen`) are not handled and
 must be updated manually.
 
-**Usage**:
+## Usage:
 
 ```console
 $ plenoptic-migrate [OPTIONS] PATHS...
