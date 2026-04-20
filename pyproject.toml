@@ -9,7 +9,6 @@ authors = [
 # needed for pathlib.copy_into
 requires-python = ">=3.14"
 dependencies = [
-    "plenoptic @ git+https://github.com/plenoptic-org/plenoptic.git@api_restructure",
     "typer>=0.24.1",
 ]
 

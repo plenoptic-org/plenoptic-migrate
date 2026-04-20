@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
-from typing import Annotated
-from rich import print
-from rich.progress import track
-from rich.console import Console
-import warnings
-import typer
-from plenoptic import _api_change
 import itertools
 from pathlib import Path
+from typing import Annotated
+
+import typer
+from rich import print
+from rich.console import Console
+from rich.progress import track
+
+from . import api_change
 
 app = typer.Typer(add_completion=False)
 stderr = Console(stderr=True)
@@ -17,9 +18,19 @@ console = Console()
 
 @app.command()
 def migrate(
-        paths: Annotated[list[Path], typer.Argument(help="Directory or text files to update (e.g., .py scripts, .ipynb notebooks, .md files). Non-text files will be skipped.")],
-        backup_dir: Annotated[Path, typer.Option(help="Path where we will create a directory to copy existing paths into. Must not exist.")] = None,
-    ):
+    paths: Annotated[
+        list[Path],
+        typer.Argument(
+            help="Directory or text files to update (e.g., .py scripts, .ipynb notebooks, .md files). Non-text files will be skipped."
+        ),
+    ],
+    backup_dir: Annotated[
+        Path,
+        typer.Option(
+            help="Path where we will create a directory to copy existing paths into. Must not exist."
+        ),
+    ] = None,
+):
     """Migrate from plenoptic 1.x to 2.0.
 
     Rewrites all occurrences of old API names to their new equivalents, in-place, for
@@ -49,7 +60,9 @@ def migrate(
 
     """
     if not backup_dir or backup_dir == Path("."):
-        backup = typer.confirm("Are you sure you wish to proceed without making a backup?")
+        backup = typer.confirm(
+            "Are you sure you wish to proceed without making a backup?"
+        )
         if not backup:
             raise typer.Abort()
     else:
@@ -61,15 +74,15 @@ def migrate(
             p.copy_into(backup_dir)
 
     deprecated = {}
-    UPDATED_API = _api_change.API_CHANGE
-    UPDATED_API.update(_api_change.SYNTH_PLOT_FUNCS)
-    UPDATED_API.update(_api_change.PLOT_FUNCS)
+    UPDATED_API = api_change.API_CHANGE
+    UPDATED_API.update(api_change.SYNTH_PLOT_FUNCS)
+    UPDATED_API.update(api_change.PLOT_FUNCS)
 
     # check all possible combinations of the module aliases
     module_aliases = []
-    for i in range(1, len(_api_change.MODULE_ALIASES)+1):
-        for mods in itertools.combinations(_api_change.MODULE_ALIASES, i):
-            module_aliases.append({k: _api_change.MODULE_ALIASES[k] for k in mods})
+    for i in range(1, len(api_change.MODULE_ALIASES) + 1):
+        for mods in itertools.combinations(api_change.MODULE_ALIASES, i):
+            module_aliases.append({k: api_change.MODULE_ALIASES[k] for k in mods})
 
     iter_paths = []
     for p in paths:
@@ -96,8 +109,10 @@ def migrate(
                 for mod, alias in aliases.items():
                     old_func_check = old_func_check.replace(mod, alias)
                     new_func_check = new_func_check.replace(mod, alias)
-                    file_contents = file_contents.replace(old_func_check, new_func_check)
-        for dep_func in _api_change.DEPRECATED:
+                    file_contents = file_contents.replace(
+                        old_func_check, new_func_check
+                    )
+        for dep_func in api_change.DEPRECATED:
             if dep_func in file_contents:
                 if dep_func in deprecated:
                     deprecated[dep_func].append(str(p))
