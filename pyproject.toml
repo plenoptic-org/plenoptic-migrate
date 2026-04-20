@@ -1,7 +1,6 @@
 [project]
 name = "plenoptic-migrate"
 dynamic = ["version"]
-authors = [{name="William F. Broderick"}]
 description = "Small CLI to help users migrate from plenoptic 1.x to 2.0"
 readme = "README.md"
 authors = [
