@@ -11,7 +11,7 @@ replace `plenoptic.synth.Metamer` with `plenoptic.Metamer`, but will not
 touch `from plenoptic.synthesize import Metamer`.
 
 We overwrite all files in-place. We therefore recommend that you track your files
-using git or make use of the --backup-dir option to create a backup. You are then
+using git or make use of the `--backup-dir` option to create a backup. You are then
 encouraged to double-check all the changes! This tool worked for the developers of
 plenoptic but has not been tested on a wide variety of setups.
 
