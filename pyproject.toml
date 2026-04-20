@@ -6,8 +6,7 @@ readme = "README.md"
 authors = [
     { name = "William F. Broderick", email = "billbrod@gmail.com" }
 ]
-# needed for pathlib.copy_into
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 dependencies = [
     "typer>=0.24.1",
 ]

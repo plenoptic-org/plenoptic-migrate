@@ -2,6 +2,7 @@
 
 import itertools
 from pathlib import Path
+import shutil
 from typing import Annotated
 
 import typer
@@ -71,7 +72,10 @@ def migrate(
         backup_dir.mkdir()
         print(f"Copying all specified files into [blue]{backup_dir}[blue]")
         for p in paths:
-            p.copy_into(backup_dir)
+            if p.is_dir():
+                shutil.copytree(p, backup_dir, dirs_exist_ok=True)
+            else:
+                shutil.copy(p, backup_dir)
 
     deprecated = {}
     UPDATED_API = api_change.API_CHANGE
@@ -87,7 +91,7 @@ def migrate(
     iter_paths = []
     for p in paths:
         if p.is_dir():
-            iter_paths.extend(list(p.rglob("**")))
+            iter_paths.extend(list(p.rglob("*")))
         else:
             iter_paths.append(p)
 
