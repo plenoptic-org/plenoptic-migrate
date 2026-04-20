@@ -26,18 +26,18 @@ def migrate(
     each file passed as a command-line argument. After rewriting, reports any deprecated
     usages that could not be automatically resolved and must be updated manually.
 
-    This script only changes fully resolvable plenoptic objects. For example, it will
+    This tool only changes fully resolvable plenoptic objects. For example, it will
     replace `plenoptic.synth.Metamer` with `plenoptic.Metamer`, but will not
     touch `from plenoptic.synthesize import Metamer`.
 
     We overwrite all files in-place. We therefore recommend that you track your files
     using git or make use of the --backup-dir option to create a backup. You are then
-    encouraged to double-check all the changes! This script worked for the developers of
+    encouraged to double-check all the changes! This tool worked for the developers of
     plenoptic but has not been tested on a wide variety of setups.
 
     Module aliases
     --------------
-    The script handles the standard module aliases used in plenoptic's tutorials
+    The tool handles the standard module aliases used in plenoptic's tutorials
     and examples:
 
         import plenoptic as po
@@ -64,6 +64,7 @@ def migrate(
     UPDATED_API = _api_change.API_CHANGE
     UPDATED_API.update(_api_change.SYNTH_PLOT_FUNCS)
     UPDATED_API.update(_api_change.PLOT_FUNCS)
+    print(UPDATED_API)
 
     # check all possible combinations of the module aliases
     module_aliases = []
@@ -79,6 +80,8 @@ def migrate(
             iter_paths.append(p)
 
     for p in track(iter_paths):
+        if p.is_dir():
+            continue
         try:
             file_contents = p.read_text()
         except Exception as e:
