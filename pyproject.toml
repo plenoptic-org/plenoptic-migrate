@@ -1,6 +1,7 @@
 [project]
 name = "plenoptic-migrate"
-version = "0.1.0"
+dynamic = ["version"]
+authors = [{name="William F. Broderick"}]
 description = "Small CLI to help users migrate from plenoptic 1.x to 2.0"
 readme = "README.md"
 authors = [
@@ -18,3 +19,13 @@ plenoptic-migrate = "plenoptic_migrate.main:app"
 [build-system]
 requires = ["setuptools", "setuptools-scm[toml]"]
 build-backend = "setuptools.build_meta"
+
+[project.urls]
+"Homepage" = "https://github.com/plenoptic-org/plenoptic-migrate"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+version_scheme = 'python-simplified-semver'
+local_scheme = 'no-local-version'
