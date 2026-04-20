@@ -16,5 +16,5 @@ dependencies = [
 plenoptic-migrate = "plenoptic_migrate.main:app"
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "setuptools-scm[toml]"]
 build-backend = "setuptools.build_meta"
