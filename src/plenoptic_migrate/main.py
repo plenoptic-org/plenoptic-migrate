@@ -24,7 +24,7 @@ def migrate(
 
     Rewrites all occurrences of old API names to their new equivalents, in-place, for
     each file passed as a command-line argument. After rewriting, reports any deprecated
-    usages that could not be automatically resolved and must be updated manually.
+    usages, which must be updated manually.
 
     This tool only changes fully resolvable plenoptic objects. For example, it will
     replace `plenoptic.synth.Metamer` with `plenoptic.Metamer`, but will not
@@ -64,7 +64,6 @@ def migrate(
     UPDATED_API = _api_change.API_CHANGE
     UPDATED_API.update(_api_change.SYNTH_PLOT_FUNCS)
     UPDATED_API.update(_api_change.PLOT_FUNCS)
-    print(UPDATED_API)
 
     # check all possible combinations of the module aliases
     module_aliases = []
@@ -101,18 +100,18 @@ def migrate(
         for dep_func in _api_change.DEPRECATED:
             if dep_func in file_contents:
                 if dep_func in deprecated:
-                    deprecated[dep_func].append(p)
+                    deprecated[dep_func].append(str(p))
                 else:
-                    deprecated[dep_func] = [p]
+                    deprecated[dep_func] = [str(p)]
             for aliases in module_aliases:
                 dep_func_check = dep_func
                 for mod, alias in aliases.items():
                     dep_func_check = dep_func_check.replace(mod, alias)
                     if dep_func_check in file_contents:
                         if dep_func_check in deprecated:
-                            deprecated[dep_func_check].append(p)
+                            deprecated[dep_func_check].append(str(p))
                         else:
-                            deprecated[dep_func_check] = [p]
+                            deprecated[dep_func_check] = [str(p)]
         p.write_text(file_contents)
 
     if deprecated:
