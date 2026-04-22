@@ -15,7 +15,7 @@ jobs:
       with:
         persist-credentials: false
     - run: |
-        URL=https://raw.githubusercontent.com/plenoptic-org/plenoptic/refs/heads/api_restructure/src/plenoptic/_api_change.py
+        URL=https://raw.githubusercontent.com/plenoptic-org/plenoptic/refs/heads/main/src/plenoptic/_api_change.py
         echo "Downloading _api_change.py from $URL"
         curl $URL > plenoptic_api_change.py
         diff plenoptic_api_change.py src/plenoptic_migrate/api_change.py
